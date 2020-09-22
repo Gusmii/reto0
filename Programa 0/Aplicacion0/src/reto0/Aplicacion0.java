@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -39,7 +40,8 @@ public class Aplicacion0 extends JFrame {
     private boolean piso0 = true;
     private boolean piso1 = false;
     private boolean piso2 = false;
-    private JPanel panel;
+    private Boolean todasApagadas = false;
+    private JPanel panel; 
     private JButton btnSubir;
     private JPanel panelPiso2;
     private JLabel lblNewLabel_2,lblNewLabel_3,lblNewLabel_4;
@@ -69,8 +71,37 @@ public class Aplicacion0 extends JFrame {
 			}
 		});
 	}
+/*
+ * Metodo para activar las alarmas al iniciar la app
+ */
+public void activarAlarma() {
 	
-	public void compararEstado() {
+	Random rnd = new Random();
+	int num = ((int)(rnd.nextDouble()*100000.0))%100 + 1;
+	
+	if(num<=33) {
+		
+		alarmaFue.setBackground(Color.RED);
+		JOptionPane.showMessageDialog(this,(String)"La alarma del piso 0 ha saltado","Alarma de incendios",JOptionPane.INFORMATION_MESSAGE,null);
+		
+	}else if (num>33 && num<=67) {
+		
+		alarmaFue2.setBackground(Color.RED);
+		JOptionPane.showMessageDialog(this,(String)"La alarma del piso 1 ha saltado","Alarma de incendios",JOptionPane.INFORMATION_MESSAGE,null);
+		
+	}else {
+		
+		alarmaFue3.setBackground(Color.RED);
+		JOptionPane.showMessageDialog(this,(String)"La alarma del piso 2 ha saltado","Alarma de incendios",JOptionPane.INFORMATION_MESSAGE,null);
+	}
+	
+	
+}
+
+/*
+ * Metodo para comparar el estado de las luces de los radiadores
+ */
+public void compararEstado() {
 		
 		String aula;
 		Boolean estado;
@@ -80,6 +111,12 @@ public class Aplicacion0 extends JFrame {
 			//System.out.println(AR_calefaccion.get(i).getAula().toString());
 			aula= AR_calefaccion.get(i).getAula();
 			estado = AR_calefaccion.get(i).getEstado();
+			
+			if (estado == false ) {
+				
+				todasApagadas = true;
+				
+			}
 			
 			for (int x = 0; x < AR_btn.size(); x++) {
 				
@@ -100,7 +137,10 @@ public class Aplicacion0 extends JFrame {
 		}
 		
 	}
-	
+
+/*
+ * Metodo para cargar los datos de la bbdd
+ */
 public void cargarCalefaccion() {
 		
 		Connection konexioa;
@@ -132,7 +172,7 @@ public void cargarCalefaccion() {
 
 /* 
  * Metodo que comprueba en que estado se encuentra la calefaccion y guarda el registro
- * */
+ */
 public void insertcalefaccion(String VarAula, JToggleButton btn) {
 
 	Connection konexioa;
@@ -219,7 +259,9 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 	
 }
 
-
+/*
+ * Metodo para cargar los datos de la bbdd 
+ */
 public void cargarAlarma() {
 	
 	Connection konexioa;
@@ -276,33 +318,9 @@ public void cargarAlarma() {
 		panelPiso0.setLayout(null);
 		
 		alarmaFue = new JButton("");
+		alarmaFue.setEnabled(false);
 		alarmaFue.setBackground(Color.GRAY);
-		alarmaFue.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				
-				Connection konexioa;
-				try {
-					konexioa = DriverManager.getConnection("jdbc:mysql://localhost/reto0", "root", "");
-					// ondo burutu baldin bada
-					System.out.println("Konexio egokia.");
-
-					Statement st = konexioa.createStatement();
-					
-					Date date = new Date();
-					DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-					st.executeUpdate("INSERT INTO alarma  VALUES ('" + hourdateFormat.format(date) + "','"
-							+ 1 + "')");
-					
-					st.close();
-					konexioa.close();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-			}
-		});
+		
 		alarmaFue.setBounds(239, 105, 107, 91);
 		panelPiso0.add(alarmaFue);
 		
@@ -412,34 +430,9 @@ public void cargarAlarma() {
 		panelPiso1.setLayout(null);
 		
 		alarmaFue2 = new JButton("");
+		alarmaFue2.setEnabled(false);
 		alarmaFue2.setBackground(Color.GRAY);
-		alarmaFue2.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				
-				Connection konexioa;
-				try {
-					konexioa = DriverManager.getConnection("jdbc:mysql://localhost/reto0", "root", "");
-					// ondo burutu baldin bada
-					System.out.println("Konexio egokia.");
-
-					Statement st = konexioa.createStatement();
-					
-					Date date = new Date();
-					DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-					st.executeUpdate("INSERT INTO alarma  VALUES ('" + hourdateFormat.format(date) + "','"
-							+ 2 + "')");
-					
-					
-					st.close();
-					konexioa.close();
-					
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
+		
 		alarmaFue2.setBounds(239, 105, 107, 91);
 		panelPiso1.add(alarmaFue2);
 		
@@ -556,32 +549,9 @@ public void cargarAlarma() {
 		contentPane.add(panelPiso2);
 		
 		alarmaFue3 = new JButton("");
+		alarmaFue3.setEnabled(false);
 		alarmaFue3.setBackground(Color.GRAY);
-		alarmaFue3.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				
-				Connection konexioa;
-				try {
-					konexioa = DriverManager.getConnection("jdbc:mysql://localhost/reto0", "root", "");
-					// ondo burutu baldin bada
-					System.out.println("Konexio egokia.");
-
-					Statement st = konexioa.createStatement();
-					
-					Date date = new Date();
-					DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-					st.executeUpdate("INSERT INTO alarma  VALUES ('" + hourdateFormat.format(date) + "','"
-							+ 3 + "')");
-					st.close();
-					konexioa.close();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-			}
-		});
+		
 		alarmaFue3.setBounds(239, 105, 107, 91);
 		panelPiso2.add(alarmaFue3);
 		
@@ -670,34 +640,10 @@ public void cargarAlarma() {
 			
 			public void actionPerformed(ActionEvent e) {
 				
-				if(alarmaFue.getBackground()== Color.GRAY||alarmaFue2.getBackground()== Color.GRAY||alarmaFue3.getBackground()== Color.GRAY) {
-					
-					for (int i = (int)(Math.random()* (100-1)) + 1; i < 100; ++i) {
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						System.out.println(i);
-						if(i == 99) {
-							
-							alarmaFue.setBackground(Color.red);
-							alarmaFue2.setBackground(Color.red);
-							alarmaFue3.setBackground(Color.red);
-							
-						}else {
-							//i++;
-						}
-					
-					
-				}
-	
-				}else {
-					alarmaFue.setBackground(Color.GRAY);
-					alarmaFue2.setBackground(Color.GRAY);
-					alarmaFue3.setBackground(Color.GRAY);
-				}
+				alarmaFue.setBackground(Color.GRAY);
+				alarmaFue2.setBackground(Color.GRAY);
+				alarmaFue3.setBackground(Color.GRAY);
+				
 				
 			}
 		});
@@ -876,7 +822,11 @@ public void cargarAlarma() {
 		panelNavegacion.add(botonCalefaccion);
 		
 		cargarCalefaccion();
+		activarAlarma();
 		
+		if(todasApagadas==false) {
+		botonCalefaccion.setText("OFF");
+		}
 	}
 	
 	public static void main1(String[] ar) {
