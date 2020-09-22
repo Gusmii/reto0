@@ -169,7 +169,8 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 				//		+ piso + "','"+ VarAula +"' ,'" + 0 + "')");
 				
 				
-				st.executeUpdate("UPDATE `calefaccion` SET `fecha`='"+ hourdateFormat.format(date) +"',`estado`= 1 WHERE aula = '"+ VarAula +"'");
+				st.executeUpdate("UPDATE `calefaccion` SET `fecha`='"+ hourdateFormat.format(date) +"',`estado`= 0 WHERE aula = '"+ VarAula +"'");
+				System.out.println("UPDATE `calefaccion` SET `fecha`='"+ hourdateFormat.format(date) +"',`estado`= 0 WHERE aula = '"+ VarAula +"'");
 				
 				st.close();
 				konexioa.close();
@@ -183,7 +184,7 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 		
 	}else {
 		
-		//Si esta apagado
+		//Si esta encendido
 		
 		
 		
@@ -199,8 +200,9 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 			
 			//System.out.println("UPDATE `calefaccion` SET `fecha`="+ hourdateFormat.format(date) +",`estado`= 0 WHERE aula = "+ VarAula +"");
 			
-			st.executeUpdate("UPDATE `calefaccion` SET `fecha`= '"+ hourdateFormat.format(date) +"',`estado`= 0 WHERE aula = '"+ VarAula +"'");
-		
+			st.executeUpdate("UPDATE `calefaccion` SET `fecha`= '"+ hourdateFormat.format(date) +"',`estado`= 1 WHERE aula = '"+ VarAula +"'");
+			System.out.println("UPDATE `calefaccion` SET `fecha`='"+ hourdateFormat.format(date) +"',`estado`= 1 WHERE aula = '"+ VarAula +"'");
+			
 			st.close();
 			konexioa.close();
 		} 
