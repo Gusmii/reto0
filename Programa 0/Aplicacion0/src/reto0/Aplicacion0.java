@@ -27,7 +27,7 @@ import javax.swing.border.EmptyBorder;
 public class Aplicacion0 extends JFrame {
 	
 	/**
-	 * 
+	 * Se declaran las variables
 	 */
 	private static final long serialVersionUID = -2952251870704117145L;
 
@@ -726,7 +726,9 @@ public void cargarAlarma() {
 		
 		
 		
-		
+		/*
+		 * Se crea el boton general de encendido o apagado de la calefaccion
+		 */
 		botonCalefaccion = new JButton("ON");
 		botonCalefaccion.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -821,9 +823,20 @@ public void cargarAlarma() {
 		
 		panelNavegacion.add(botonCalefaccion);
 		
+		/*
+		 * Carga todas las luces de las calefacciones
+		 */		
 		cargarCalefaccion();
+		
+		/*
+		 * Activa una de las 3 alarmas 
+		 */
 		activarAlarma();
 		
+		
+		/*
+		 * Si estan todas encendidas el boton general sera de off
+		 */
 		if(todasApagadas==false) {
 		botonCalefaccion.setText("OFF");
 		}
