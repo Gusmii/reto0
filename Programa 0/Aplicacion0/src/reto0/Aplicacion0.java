@@ -273,18 +273,29 @@ public void cargarAlarma() {
 		Statement st = konexioa.createStatement();
 		ResultSet rse = st.executeQuery("SELECT * FROM alarma");
 		
+		
+		if(rse.getFetchSize()== 0){
+			
+			/*
+			 * Activa una de las 3 alarmas 
+			 */
+			activarAlarma();
+		}
+		
 		while (rse.next()) {
 			int piso = Integer.parseInt(rse.getObject("piso").toString());
 			
 			Boolean estado = Boolean.parseBoolean(rse.getObject("estado").toString());
 			
 			alarma alarma1 = new alarma(rse.getObject("fecha").toString(), piso, estado );
-			AR_alarma.add(alarma1); 
-			
+			//System.out.println(alarma1.getPiso());
+			AR_alarma.add(alarma1); 	
 		}
 		st.close();
 		rse.close();
 		konexioa.close();
+		
+		compararAlarma();
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -294,8 +305,41 @@ public void cargarAlarma() {
 	
 }
 
-
+/*
+ * Compara los datos de la bbdd con 
+ */
+public void compararAlarma() {
 	
+	for (int i = 0; i < AR_alarma.size(); i++) {
+		
+		if(i==0) {
+			
+			if(AR_alarma.get(i).getEstado()==true) {
+				
+				alarmaFue.setBackground(Color.RED);
+			}
+			
+		}else if(i==1) {
+			
+			if(AR_alarma.get(i).getEstado()==true) {
+				
+				alarmaFue2.setBackground(Color.RED);
+			}
+			
+		}else {
+			
+			if(AR_alarma.get(i).getEstado()==true) {
+				
+				alarmaFue3.setBackground(Color.RED);
+			}
+			
+		}
+		
+	}
+	
+	
+}
+
 	
 	/**
 	 * Create the frame.
@@ -308,7 +352,7 @@ public void cargarAlarma() {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		cargarAlarma();
+		
 		
 		
 		panelPiso0 = new JPanel();
@@ -828,10 +872,13 @@ public void cargarAlarma() {
 		 */		
 		cargarCalefaccion();
 		
+		
+		
+		
 		/*
-		 * Activa una de las 3 alarmas 
+		 * Carga los datos de la bbdd en las alarmas
 		 */
-		activarAlarma();
+		cargarAlarma();
 		
 		
 		/*
