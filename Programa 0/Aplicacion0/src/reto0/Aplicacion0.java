@@ -25,6 +25,12 @@ import javax.swing.border.EmptyBorder;
 
 public class Aplicacion0 extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2952251870704117145L;
+
+
 	Boolean color=false;
 	
 	
@@ -38,11 +44,12 @@ public class Aplicacion0 extends JFrame {
     private JPanel panelPiso2;
     private JLabel lblNewLabel_2,lblNewLabel_3,lblNewLabel_4;
     private JToggleButton calefaccion,calefaccion2,calefaccion3,calefaccion4,calefaccion5,calefaccion6,calefaccion7,calefaccion8,calefaccion9,calefaccion10,calefaccion11,calefaccion12,calefaccion13,calefaccion14,calefaccion15,calefaccion16;
-    private JButton botonCalefaccion,botonRadiador;
+    private JButton botonCalefaccion;
    
     private JButton alarma;
     private JButton alarmaFue,alarmaFue2,alarmaFue3;
     
+    private ArrayList<JToggleButton> AR_btn = new ArrayList<JToggleButton>();
     private ArrayList<alarma> AR_alarma = new ArrayList<alarma>();
     private ArrayList<calefaccion> AR_calefaccion = new ArrayList<calefaccion>();
     public static void sleep(long milis)throws InterruptedException{}
@@ -63,6 +70,37 @@ public class Aplicacion0 extends JFrame {
 		});
 	}
 	
+	public void compararEstado() {
+		
+		String aula;
+		Boolean estado;
+		
+		for (int i = 0; i < AR_calefaccion.size(); i++) {
+			
+			//System.out.println(AR_calefaccion.get(i).getAula().toString());
+			aula= AR_calefaccion.get(i).getAula();
+			estado = AR_calefaccion.get(i).getEstado();
+			
+			for (int x = 0; x < AR_btn.size(); x++) {
+				
+				if(aula.equals(AR_btn.get(x).getText())) {
+					
+					if(estado == true) {
+					
+						AR_btn.get(x).setSelected(true);
+						
+					}
+					
+					break;
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
 public void cargarCalefaccion() {
 		
 		Connection konexioa;
@@ -72,14 +110,18 @@ public void cargarCalefaccion() {
 			System.out.println("Konexio egokia.");
 
 			Statement st = konexioa.createStatement();
-			ResultSet rse = st.executeQuery("SELECT * FROM alarma");
+			ResultSet rse = st.executeQuery("SELECT * FROM calefaccion");
 			
 			while (rse.next()) {
 				int piso = Integer.parseInt(rse.getObject("piso").toString());
-				calefaccion calefaccion1 = new calefaccion(rse.getObject("fecha").toString(), piso );
-				AR_calefaccion.add(calefaccion1); 
-				
+				Boolean estado = Boolean.parseBoolean(rse.getObject("estado").toString());
+				String aula = rse.getObject("aula").toString();
+				calefaccion calefaccion1 = new calefaccion(rse.getObject("fecha").toString(), piso , aula, estado);
+				AR_calefaccion.add(calefaccion1); 		
 			}
+			compararEstado();
+			
+			
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -96,6 +138,8 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 	Connection konexioa;
 	Statement st = null;
 	
+	/*
+	
 	int piso=0;
 	
 	if(piso1==true) {
@@ -107,6 +151,7 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 		piso=2;
 		
 	}
+	*/
 	
 	if(!btn.isSelected()) {
 		
@@ -120,11 +165,15 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 				
 				Date date = new Date();
 				DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-				st.executeUpdate("INSERT INTO calefaccion  VALUES ('" + hourdateFormat.format(date) + "','"
-						+ piso + "','"+ VarAula +"' ,'" + 0 + "')");
+				//st.executeUpdate("INSERT INTO calefaccion  VALUES ('" + hourdateFormat.format(date) + "','"
+				//		+ piso + "','"+ VarAula +"' ,'" + 0 + "')");
 				
-			
-			
+				
+				st.executeUpdate("UPDATE `calefaccion` SET `fecha`='"+ hourdateFormat.format(date) +"',`estado`= 1 WHERE aula = '"+ VarAula +"'");
+				
+				st.close();
+				konexioa.close();
+				
 			
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
@@ -143,9 +192,22 @@ public void insertcalefaccion(String VarAula, JToggleButton btn) {
 		try {
 			konexioa = DriverManager.getConnection("jdbc:mysql://localhost/reto0", "root", "");
 			st = konexioa.createStatement();
-			st.executeUpdate("INSERT INTO calefaccion  VALUES ('" + hourdateFormat.format(date) + "','"
-					+ piso + "','"+ VarAula +"' ,'" + 1 + "')");
-		} catch (SQLException e) {
+			
+			
+			//st.executeUpdate("INSERT INTO calefaccion  VALUES ('" + hourdateFormat.format(date) + "','"
+			//		+ piso + "','"+ VarAula +"' ,'" + 1 + "')");
+			
+			//System.out.println("UPDATE `calefaccion` SET `fecha`="+ hourdateFormat.format(date) +",`estado`= 0 WHERE aula = "+ VarAula +"");
+			
+			st.executeUpdate("UPDATE `calefaccion` SET `fecha`= '"+ hourdateFormat.format(date) +"',`estado`= 0 WHERE aula = '"+ VarAula +"'");
+		
+			st.close();
+			konexioa.close();
+		} 
+		
+		
+		
+		catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -169,15 +231,22 @@ public void cargarAlarma() {
 		
 		while (rse.next()) {
 			int piso = Integer.parseInt(rse.getObject("piso").toString());
-			alarma alarma1 = new alarma(rse.getObject("fecha").toString(), piso );
+			
+			Boolean estado = Boolean.parseBoolean(rse.getObject("estado").toString());
+			
+			alarma alarma1 = new alarma(rse.getObject("fecha").toString(), piso, estado );
 			AR_alarma.add(alarma1); 
 			
 		}
-		
+		st.close();
+		rse.close();
+		konexioa.close();
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+	
+	
 	
 }
 
@@ -196,7 +265,7 @@ public void cargarAlarma() {
 		contentPane.setLayout(null);
 		
 		cargarAlarma();
-		cargarCalefaccion();
+		
 		
 		panelPiso0 = new JPanel();
 		panelPiso0.setForeground(Color.WHITE);
@@ -223,6 +292,8 @@ public void cargarAlarma() {
 					st.executeUpdate("INSERT INTO alarma  VALUES ('" + hourdateFormat.format(date) + "','"
 							+ 1 + "')");
 					
+					st.close();
+					konexioa.close();
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -234,7 +305,6 @@ public void cargarAlarma() {
 		panelPiso0.add(alarmaFue);
 		
 		JToggleButton calefaccion = new JToggleButton("a1");
-		calefaccion.setBackground(Color.RED);
 		
 		calefaccion.setBounds(90, 22, 27, 28);
 		panelPiso0.add(calefaccion);
@@ -357,6 +427,10 @@ public void cargarAlarma() {
 					DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					st.executeUpdate("INSERT INTO alarma  VALUES ('" + hourdateFormat.format(date) + "','"
 							+ 2 + "')");
+					
+					
+					st.close();
+					konexioa.close();
 					
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
@@ -497,7 +571,8 @@ public void cargarAlarma() {
 					DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					st.executeUpdate("INSERT INTO alarma  VALUES ('" + hourdateFormat.format(date) + "','"
 							+ 3 + "')");
-					
+					st.close();
+					konexioa.close();
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -681,6 +756,29 @@ public void cargarAlarma() {
 		panelNavegacion.add(btnBajar);
 		contentPane.add(panelNavegacion);
 		
+		
+			
+		AR_btn.add(calefaccion);
+		AR_btn.add(calefaccion2);
+		AR_btn.add(calefaccion3);
+		AR_btn.add(calefaccion4);
+		AR_btn.add(calefaccion5);
+		AR_btn.add(calefaccion6);
+		AR_btn.add(calefaccion7);
+		AR_btn.add(calefaccion8);
+		AR_btn.add(calefaccion9);
+		AR_btn.add(calefaccion10);
+		AR_btn.add(calefaccion11);
+		AR_btn.add(calefaccion12);
+		AR_btn.add(calefaccion13);
+		AR_btn.add(calefaccion14);
+		AR_btn.add(calefaccion15);
+		AR_btn.add(calefaccion16);
+			
+		
+		
+		
+		
 		botonCalefaccion = new JButton("ON");
 		botonCalefaccion.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -703,6 +801,28 @@ public void cargarAlarma() {
 				calefaccion15.setSelected(true);
 				calefaccion16.setSelected(true);
 				botonCalefaccion.setText("OFF");
+				
+				Connection konexioa;
+				Statement st = null;
+				
+				Date date = new Date();
+				DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+				try {
+					konexioa = DriverManager.getConnection("jdbc:mysql://localhost/reto0", "root", "");
+					st = konexioa.createStatement();
+					
+					System.out.println("UPDATE `calefaccion` SET `fecha`="+ hourdateFormat.format(date) +",`estado`= 1 ");
+					
+					st.executeUpdate("UPDATE `calefaccion` SET `fecha`= '"+ hourdateFormat.format(date) +"',`estado`= 1 ");
+				
+				
+					st.close();
+					konexioa.close();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				}
 				else if(botonCalefaccion.getText().equals("OFF")){
 					
@@ -723,13 +843,37 @@ public void cargarAlarma() {
 					calefaccion15.setSelected(false);
 					calefaccion16.setSelected(false);
 					botonCalefaccion.setText("ON");
+					
+					
+					Connection konexioa;
+					Statement st = null;
+					
+					Date date = new Date();
+					DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					try {
+						konexioa = DriverManager.getConnection("jdbc:mysql://localhost/reto0", "root", "");
+						st = konexioa.createStatement();
+						
+						System.out.println("UPDATE `calefaccion` SET `fecha`="+ hourdateFormat.format(date) +",`estado`= 0 ");
+						
+						st.executeUpdate("UPDATE `calefaccion` SET `fecha`= '"+ hourdateFormat.format(date) +"',`estado`= 0 ");
+					
+						st.close();
+						konexioa.close();
+					
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 					}
 			}
 		});
 		botonCalefaccion.setBounds(425, 10, 85, 65);
 		
 		panelNavegacion.add(botonCalefaccion);
-	
+		
+		cargarCalefaccion();
 		
 	}
 	
